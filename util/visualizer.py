@@ -1,10 +1,12 @@
 from typing import Any
+import torch
 from torch.utils.tensorboard import SummaryWriter
+import torch.nn as nn
 import cv2
 import numpy as np
 
 class TensorboardVisualizer:
-    def __init__(self, log_dir: str="."):
+    def __init__(self, log_dir: str="runs"):
         """
         初始化函数，创建一个SummaryWriter对象用于记录训练数据到指定的日志目录。
 
@@ -34,12 +36,25 @@ class TensorboardVisualizer:
             global_step (int): 当前的训练步数。
         """
         self.writer.add_image(tag, img_tensor, global_step)
+        
+    
+    def show_model(self, model: nn.Module, input_to_model: torch.Tensor):
+        """
+        可视化模型的结构和输入输出。
+
+        Args:
+            model (Any): 要可视化的模型对象。
+            input_to_model (Any): 模型的输入数据。
+        """
+        self.writer.add_graph(model, input_to_model)
 
     def close(self):
         """
         关闭SummaryWriter，完成日志记录后需要调用此方法来释放资源。
         """
         self.writer.close()
+        
+show_model = TensorboardVisualizer().show_model
         
 def generate_video(frames:np.array, video_name:str="a.mp4"):
     height, width, _ = frames[0].shape
